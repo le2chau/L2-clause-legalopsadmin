@@ -784,7 +784,7 @@
    bug (Need By was 379px vs 250.3px on row 1 at 1100px viewport). */
 .aribaFilterBar.sapMHBox {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(13.5rem, 1fr));
+    grid-template-columns: repeat(5, minmax(0, 1fr));
     gap: 1rem 0.5rem;
 }
 
@@ -793,17 +793,9 @@
 .aribaFilterBar > .sapMFlexItem {
     margin: 0 !important;
     padding: 0 0.25rem;
+    min-width: 0;
 }
 
-/* Adapt Filters: spans the full last row (grid-column:1/-1), button right+bottom aligned.
-   Tested: 1/-1 resolves correctly for auto-fit at 4/3/2/1-column counts — no phantom column.
-   Matches Figma Container—Buttons (primaryAxisAlignItems=MAX, bottom-padded). */
-.aribaFilterBar > .sapMFlexItem:last-child {
-    grid-column: 1 / -1;
-    display: flex;
-    justify-content: flex-end;
-    align-items: flex-end;
-}
 
 /* Filter field wrapper: label + control kept as ONE grid child (a VBox) so the grid track
    count stays one-per-field, not one-per-label. Fill the grid cell so the control spans the
@@ -811,6 +803,25 @@
 .aribaFilterBar > .sapMFlexItem > .aribaFilterField {
     width: 100%;
     height: 100%;
+}
+
+/* Adapt Filters button: last grid column, bottom-aligned, right-aligned within its 1fr cell */
+.aribaFilterBar > .sapMFlexItem:last-child {
+    display: flex;
+    justify-content: flex-end;
+    align-items: flex-end;
+    padding-left: 1rem;
+}
+
+/* Reset the ShellBar global SearchField sizing rule (.sapFShellBar .sapMSF sets flex:0 0 18rem)
+   so the filter bar's SearchField fills its 1fr track like the other fields. */
+.aribaFilterBar .sapMSF {
+    flex: none !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: none !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
 }
 
 /* Label-to-field gap. 0.25rem (4px) is a micro-adjustment with no dedicated --sap token at
@@ -840,6 +851,12 @@
 .prTableRowPadding tbody tr.sapMLIB > td {
     padding-top: 0.75rem;
     padding-bottom: 0.75rem;
+    vertical-align: middle;
+}
+
+.prTableRowPadding tbody tr.sapMLIB > td:nth-child(3) {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
 }
 
 /* Space below popin content before next row */
@@ -933,4 +950,91 @@
 }
 .aribaColSettingsPopover .sapMSegB .sapMSegBBtn .sapMSegBBtnInner {
     font-family: var(--sapButton_FontFamily);
+}
+
+/* ---- Clauses table: row indentation ---- */
+
+/* Clause rows: reserve space for the chevron (no extra indent needed) */
+.aribaClauseRow {
+    display: flex;
+    align-items: center;
+}
+
+/* Type rows: badge aligns with the clause title text.
+   The chevron button occupies 66px; since class bindings on HBox don't resolve
+   in this prototype, we target the HBox that contains .aribaTypeToken (type rows)
+   but not .aribaClauseTitleBox (clause rows) using :has(). */
+.aribaTypeRow {
+    display: flex;
+    align-items: center;
+}
+.sapMHBox:has(> .aribaTypeNameBox) {
+    padding-left: 4.125rem;
+}
+
+/* Chevron button: wider left/right padding for a larger hit area */
+.aribaClauseChevron.sapMBtn {
+    min-width: 0;
+    width: auto;
+    height: auto;
+    padding: 0.5rem 0.75rem !important;
+}
+.aribaClauseChevron .sapMBtnInner {
+    padding: 0.5rem 0.75rem !important;
+    min-width: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+.aribaClauseChevron .sapMBtnIcon {
+    font-size: 0.75rem;
+    color: var(--sapContent_IconColor);
+}
+
+/* Clause title + subtitle VBox */
+.aribaClauseTitleBox {
+    gap: 0;
+    justify-content: center;
+}
+.aribaClauseTitle.sapMTitle {
+    font-size: var(--sapFontSize);
+    font-family: var(--sapFontBoldFamily);
+    line-height: 1.25;
+}
+.aribaClauseSubtitle.sapMText {
+    font-size: var(--sapFontSmallSize);
+    color: var(--sapContent_LabelColor);
+    line-height: 1.2;
+}
+
+/* ---- Clause type token — plain text, no pill ---- */
+.aribaTypeToken.sapMObjStatus {
+    background: transparent;
+    border: none;
+    padding: 0;
+    border-radius: 0;
+    font-size: var(--sapFontSize);
+    color: var(--sapTextColor);
+    font-weight: normal;
+}
+
+/* ---- Group by Category: group header rows ---- */
+.aribaL2Page .sapMGHLI {
+    background: var(--sapList_GroupHeaderBackground);
+    font-family: var(--sapFontBoldFamily);
+}
+.aribaL2Page .sapMGHLITitle {
+    font-size: var(--sapFontSize);
+    color: var(--sapGroup_TitleTextColor);
+}
+/* Match the nav-column cell to the row background — without this the cell
+   is transparent and shows white while the rest of the row is gray.
+   The row's actual gray comes from --sapNeutralBackground (#eff1f2). */
+.prTableRowPadding .sapMGHLI .sapMListTblNavCol {
+    background-color: var(--sapNeutralBackground) !important;
+}
+
+/* Type row item: slightly lighter background to distinguish from clause rows */
+.prTableRowPadding .aribaTypeRowItem.sapMLIB {
+    background: var(--sapList_Background);
 }

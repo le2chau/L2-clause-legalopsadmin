@@ -678,6 +678,11 @@ sap.ui.define([
 
         // ---- Handlers ----
 
+        onFCLStateChange: function (oEvent) {
+            var oNextLayout = oEvent.getParameter("layout");
+            this.getOwnerComponent().getModel("app").setProperty("/layout", oNextLayout);
+        },
+
         HOME_URL: "https://pages.github.tools.sap/ariba-ux-framework-platform/ux-prototypes/prototypes/AribaHome-SAL/",
 
         onNavBack: function () {

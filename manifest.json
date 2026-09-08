@@ -30,7 +30,9 @@
                 "sap.m": {},
                 "sap.f": {},
                 "sap.tnt": {},
-                "sap.ui.core": {}
+                "sap.ui.core": {},
+                "sap.uxap": {},
+                "sap.ui.layout": {}
             }
         },
         "contentDensities": {
@@ -46,7 +48,7 @@
         "resources": {
             "css": [
                 {
-                    "uri": "css/style.css?v=22"
+                    "uri": "css/style.css?v=31"
                 }
             ]
         }

@@ -110,7 +110,25 @@
 
         <!-- Main Content -->
         <tnt:mainContents>
-            <mvc:XMLView viewName="com.sap.ariba.l2purchaserequisition.view.PurchaseRequisitionList" />
+            <f:FlexibleColumnLayout
+                id="fcl"
+                layout="{app>/layout}"
+                stateChange=".onFCLStateChange"
+                backgroundDesign="Translucent"
+            >
+                <f:beginColumnPages>
+                    <mvc:XMLView
+                        id="beginView"
+                        viewName="com.sap.ariba.l2purchaserequisition.view.PurchaseRequisitionList"
+                    />
+                </f:beginColumnPages>
+                <f:midColumnPages>
+                    <mvc:XMLView
+                        id="midView"
+                        viewName="com.sap.ariba.l2purchaserequisition.view.ClauseDetail"
+                    />
+                </f:midColumnPages>
+            </f:FlexibleColumnLayout>
         </tnt:mainContents>
 
     </tnt:ToolPage>

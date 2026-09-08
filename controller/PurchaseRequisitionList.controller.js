@@ -12,26 +12,38 @@ sap.ui.define([
 ], function (Controller, ResizeHandler, Filter, FilterOperator, JSONModel, Sorter, MessageToast, Fragment, Token, FileUploader) {
     "use strict";
 
-    // Starts-with, case-insensitive suggestion filter. Replaces the sap.m default ("contains").
     function _startsWithFilter(sValue, oItem) {
         return oItem.getText().toLowerCase().indexOf(sValue.toLowerCase()) === 0;
     }
 
     var L3_URL = "https://le2chau.github.io/L3-template-legalopsadmin/";
 
-    // Maps column header label text → mock data binding path used for sorting
     var _mColSortPaths = {
-        "PR Title":  "title",
-        "Status":    "status",
-        "Supplier":  "supplier",
-        "Requester": "requester",
-        "Amount":    "amountValue",
-        "Need By":   "needBy"
+        "Category / Clause / Type": "title",
+        "Category":                 "category",
+        "Governing Law":            "governingLaw",
+        "Language":                 "language",
+        "Status":                   "status",
+        "Changed On":               "changedOn"
+    };
+
+    // Maps typeVariant → ObjectStatus state + inverted flag
+    var _mTypeVariantState = {
+        "standard":  { state: "None", inverted: false },
+        "preferred": { state: "None", inverted: false },
+        "fallback":  { state: "None", inverted: false }
     };
 
     return Controller.extend("com.sap.ariba.l2purchaserequisition.controller.PurchaseRequisitionList", {
 
         onInit: function () {
+            this._sCurrentView = "default";
+            this._oExpandedClauses = {};
+            this._oColState = {};
+
+            // Register display model early so bindings resolve
+            this.getView().setModel(new JSONModel({ items: [], countLabel: "" }), "display");
+
             var oTable = this.byId("prTable");
             oTable.setHiddenInPopin([]);
             oTable.setSticky(["ColumnHeaders"]);
@@ -41,99 +53,188 @@ sap.ui.define([
 
             this.byId("governingLawFilter").setFilterFunction(_startsWithFilter);
 
-            // Per-column settings state (keyed by column header label text)
-            this._oColState = {};
-
-            // colSettings model: drives the Column Settings popover bindings
             this.getView().setModel(
                 new JSONModel({
                     columnLabel: "",
                     columnWidthPx: 160,
-                    "sort_PR Title":   "none",
-                    "sort_Status":     "none",
-                    "sort_Supplier":   "none",
-                    "sort_Requester":  "none",
-                    "group_PR Title":  false,
-                    "group_Status":    false,
-                    "group_Supplier":  false,
-                    "group_Requester": false
+                    "sort_Category / Clause / Type": "none",
+                    "sort_Category":      "none",
+                    "sort_Governing Law": "none",
+                    "sort_Language":      "none",
+                    "sort_Status":        "none",
+                    "sort_Changed On":    "none",
+                    "group_Category / Clause / Type": false,
+                    "group_Category":     false
                 }),
                 "colSettings"
             );
+
+            // Build display model once mock data is available
+            var oMockModel = this.getOwnerComponent().getModel("mock");
+            if (oMockModel.getData() && oMockModel.getData().clauses) {
+                this._buildDisplayModel();
+            } else {
+                oMockModel.attachRequestCompleted(this._buildDisplayModel.bind(this));
+            }
         },
 
-        _selectNavItem: function () {
-            var oNavList, oItem;
-            sap.ui.core.Element.registry.forEach(function (el) {
-                if (!oNavList && el.isA && el.isA("sap.tnt.NavigationList")) {
-                    oNavList = el;
+        // ---- Display model ----
+
+        _buildDisplayModel: function () {
+            var aClauses = this.getOwnerComponent().getModel("mock").getProperty("/clauses") || [];
+            var bGrouped = this._sCurrentView === "groupByCategory";
+            var aItems = [];
+
+            aClauses.forEach(function (oClause) {
+                var bExpanded = !!this._oExpandedClauses[oClause.id];
+
+                aItems.push({
+                    rowType:         "clause",
+                    isClause:        true,
+                    isType:          false,
+                    clauseId:        oClause.id,
+                    title:           oClause.title,
+                    subtitle:        "",
+                    category:        oClause.category,
+                    categoryDisplay: bGrouped ? "—" : oClause.category,
+                    governingLaw:    "—",
+                    language:        "—",
+                    status:          oClause.status,
+                    statusState:     oClause.statusState,
+                    changedOn:       oClause.changedOn,
+                    chevronIcon:     bExpanded ? "sap-icon://navigation-down-arrow" : "sap-icon://navigation-right-arrow",
+                    navType:         "Inactive",
+                    rowClass:        ""
+                });
+
+                if (bExpanded) {
+                    (oClause.types || []).forEach(function (oType) {
+                        var oVariant = _mTypeVariantState[oType.typeVariant] || { state: "None", inverted: false };
+                        aItems.push({
+                            rowType:         "type",
+                            isClause:        false,
+                            isType:          true,
+                            clauseId:        oClause.id,
+                            clauseTitle:     oClause.title,
+                            title:           "",
+                            subtitle:        oClause.id + "-" + oType.typeVariant.slice(0, 3).toUpperCase(),
+                            category:        oClause.category,
+                            categoryDisplay: oClause.category,
+                            governingLaw:    oType.governingLaw,
+                            language:        oType.language,
+                            status:          oType.status,
+                            statusState:     oType.statusState,
+                            changedOn:       oType.changedOn,
+                            typeName:        oType.typeName,
+                            typeVariant:     oType.typeVariant,
+                            typeState:       oVariant.state,
+                            typeInverted:    oVariant.inverted,
+                            chevronIcon:     "",
+                    navType:         "Navigation",   // was "Inactive" — ensures nav column always present, preventing layout shift on expand
+                    indentClass:     "aribaTypeRow",
+                            rowClass:        "aribaTypeRowItem"
+                        });
+                    });
                 }
-                if (!oItem && el.isA && el.isA("sap.tnt.NavigationListItem") && el.getText && el.getText() === "Legal Agreement Templates") {
-                    oItem = el;
-                }
-            });
-            if (oNavList && oItem) {
-                oNavList.setSelectedItem(oItem);
+            }.bind(this));
+
+            var oDisplayModel = this.getView().getModel("display");
+            oDisplayModel.setProperty("/items", aItems);
+            oDisplayModel.setProperty("/countLabel", "(" + aClauses.length + ")");
+
+            // Apply grouping sorter if needed
+            if (bGrouped) {
+                setTimeout(function () {
+                    var oBinding = this.byId("prTable").getBinding("items");
+                    if (oBinding) {
+                        oBinding.sort(new Sorter("category", false, function (oContext) {
+                            var sCat = oContext.getProperty("category");
+                            // Count only clause-level rows for this category
+                            var nCount = aItems.filter(function (o) {
+                                return o.category === sCat && o.rowType === "clause";
+                            }).length;
+                            return { key: sCat, text: sCat + " (" + nCount + ")" };
+                        }));
+                    }
+                }.bind(this), 0);
+            } else {
+                setTimeout(function () {
+                    var oBinding = this.byId("prTable").getBinding("items");
+                    if (oBinding) { oBinding.sort([]); }
+                }.bind(this), 0);
             }
         },
 
-        // Retries until the table DOM exists (async root view may render later than
-        // the onInit tick). Sets contextual width to the DynamicPage content area so
-        // autoPopinMode uses the true available width instead of the ToolPage wrapper.
-        _syncAndRegisterResize: function (nAttempt) {
-            var oTable = this.byId("prTable");
-            var oTableDom = oTable && oTable.getDomRef();
-            if (!oTableDom && nAttempt < 10) {
-                setTimeout(this._syncAndRegisterResize.bind(this, nAttempt + 1), 50);
-                return;
-            }
-            this._syncContextualWidth();
-            var oContentEl = oTableDom && oTableDom.closest(".sapFDynamicPageContent");
-            if (oContentEl && !this._sResizeHandlerId) {
-                this._sResizeHandlerId = ResizeHandler.register(
-                    oContentEl,
-                    this._syncContextualWidth.bind(this)
-                );
-            }
+        // ---- View toggle ----
+
+        onViewToggle: function (oEvent) {
+            this._sCurrentView = oEvent.getParameter("item").getKey();
+            // Reset expanded state when switching views for clarity
+            this._oExpandedClauses = {};
+            this._buildDisplayModel();
         },
 
-        onExit: function () {
-            if (this._sResizeHandlerId) {
-                ResizeHandler.deregister(this._sResizeHandlerId);
+        // ---- Clause expand/collapse ----
+
+        onClauseExpand: function (oEvent) {
+            // Stop propagation so the row itemPress doesn't fire
+            oEvent.cancelBubble();
+
+            var oBtn = oEvent.getSource();
+            // Walk up to the ColumnListItem to get its binding context
+            var oItem = oBtn.getParent(); // HBox
+            while (oItem && !oItem.isA("sap.m.ColumnListItem")) {
+                oItem = oItem.getParent();
             }
-            if (this._oAdaptFiltersDialog) {
-                this._oAdaptFiltersDialog.destroy();
-            }
-            if (this._oColSettingsPopover) {
-                this._oColSettingsPopover.destroy();
-            }
-            if (this._oCreateFromDocDialog) {
-                this._oCreateFromDocDialog.destroy();
-            }
+            if (!oItem) { return; }
+
+            var oCtx = oItem.getBindingContext("display");
+            var sClauseId = oCtx.getProperty("clauseId");
+
+            this._oExpandedClauses[sClauseId] = !this._oExpandedClauses[sClauseId];
+            this._buildDisplayModel();
         },
 
-        _syncContextualWidth: function () {
-            var oTable = this.byId("prTable");
-            if (!oTable) { return; }
-            var oTableDom = oTable.getDomRef();
-            var oContentEl = oTableDom && oTableDom.closest(".sapFDynamicPageContent");
-            if (!oContentEl) { return; }
-            var nWidth = Math.floor(oContentEl.getBoundingClientRect().width);
-            if (nWidth > 0) {
-                oTable.setContextualWidth(nWidth + "px");
-            }
+        // ---- Row press ----
+
+        onItemPress: function (oEvent) {
+            var oItem = oEvent.getParameter("listItem") || oEvent.getSource();
+            var oCtx = oItem.getBindingContext("display");
+            if (!oCtx) { return; }
+            if (oCtx.getProperty("rowType") !== "type") { return; }
+
+            var oAppModel = this.getOwnerComponent().getModel("app");
+            oAppModel.setProperty("/selectedClauseId",    oCtx.getProperty("clauseId"));
+            oAppModel.setProperty("/selectedClauseTitle", oCtx.getProperty("clauseTitle"));
+            oAppModel.setProperty("/selectedTypeName",    oCtx.getProperty("typeName"));
+            oAppModel.setProperty("/selectedTypeVariant", oCtx.getProperty("typeVariant"));
+            oAppModel.setProperty("/layout", "TwoColumnsMidExpanded");
         },
 
-        // ---- Filtering ----
+        // ---- Filter ----
 
-        // aExcludeKeys (optional): requester keys to treat as already-removed this tick — used
-        // by onRequesterTokenUpdate, where tokenUpdate fires before the token aggregation mutates.
-        _applyFilters: function (aExcludeKeys) {
-            var oTable = this.byId("prTable");
-            var oBinding = oTable.getBinding("items");
-            var aFilters = [];
+        onSearch: function () {
+            this._applyFilters();
+        },
 
+        onGoverningLawTokenUpdate: function (oEvent) {
+            var aRemovedTokens = oEvent.getParameter("removedTokens") || [];
+            var aExcludeKeys = aRemovedTokens.map(function (t) { return t.getKey(); });
+            this._applyFilters(aExcludeKeys);
+        },
+
+        _applyFilters: function (aExcludeGovLawKeys) {
             var sSearch = this.byId("searchField").getValue();
+            var aStatusKeys = this.byId("statusFilter").getSelectedKeys();
+            var aCategoryKeys = this.byId("categoryFilter").getSelectedKeys();
+            var aGovLawTokens = this.byId("governingLawFilter").getTokens() || [];
+            if (aExcludeGovLawKeys && aExcludeGovLawKeys.length) {
+                aGovLawTokens = aGovLawTokens.filter(function (t) {
+                    return aExcludeGovLawKeys.indexOf(t.getKey()) === -1;
+                });
+            }
+
+            var aFilters = [];
             if (sSearch) {
                 aFilters.push(new Filter({
                     filters: [
@@ -143,119 +244,76 @@ sap.ui.define([
                     and: false
                 }));
             }
-
-            // Status: MultiComboBox -> OR across selected keys. getSelectedKeys() inside
-            // selectionChange reflects the just-toggled item (verified 1.148.1: the
-            // selectedItems association updates before selectionChange fires).
-            var aStatusKeys = this.byId("statusFilter").getSelectedKeys();
             if (aStatusKeys.length) {
                 aFilters.push(new Filter({
-                    filters: aStatusKeys.map(function (sKey) {
-                        return new Filter("status", FilterOperator.EQ, sKey);
-                    }),
+                    filters: aStatusKeys.map(function (k) { return new Filter("status", FilterOperator.EQ, k); }),
                     and: false
                 }));
             }
-
-            // Contract Type: MultiComboBox -> OR across selected keys
-            var aContractTypeKeys = this.byId("contractTypeFilter").getSelectedKeys();
-            if (aContractTypeKeys.length) {
+            if (aCategoryKeys.length) {
                 aFilters.push(new Filter({
-                    filters: aContractTypeKeys.map(function (sKey) {
-                        return new Filter("contractType", FilterOperator.EQ, sKey);
-                    }),
+                    filters: aCategoryKeys.map(function (k) { return new Filter("category", FilterOperator.EQ, k); }),
                     and: false
                 }));
             }
-
-            // Governing Law: MultiInput -> OR across token keys. aExcludeKeys drops keys
-            // for tokens being removed this event (tokenUpdate fires before the aggregation
-            // mutates — verified 1.148.1 — so getTokens() still includes them here).
-            var aGovLawKeys = this.byId("governingLawFilter").getTokens().map(function (oToken) {
-                return oToken.getKey();
-            });
-            if (aExcludeKeys && aExcludeKeys.length) {
-                aGovLawKeys = aGovLawKeys.filter(function (sKey) { return aExcludeKeys.indexOf(sKey) === -1; });
-            }
-            if (aGovLawKeys.length) {
+            if (aGovLawTokens.length) {
                 aFilters.push(new Filter({
-                    filters: aGovLawKeys.map(function (sKey) {
-                        return new Filter("governingLaw", FilterOperator.EQ, sKey);
-                    }),
+                    filters: aGovLawTokens.map(function (t) { return new Filter("governingLaw", FilterOperator.EQ, t.getKey()); }),
                     and: false
                 }));
             }
 
-            oBinding.filter(aFilters.length > 0 ? new Filter({ filters: aFilters, and: true }) : []);
+            var oBinding = this.byId("prTable").getBinding("items");
+            oBinding.filter(aFilters.length ? new Filter(aFilters, true) : []);
         },
 
-        onSearch: function () {
-            this._applyFilters();
-        },
+        // ---- Sort / Column Settings (unchanged pattern) ----
 
-        // ---- Governing Law token removal ----
+        onColSettingsSortChange: function (oEvent) {
+            var sKey = oEvent.getParameter("selectedItem").getKey();
+            var sLabel = this.getView().getModel("colSettings").getProperty("/columnLabel");
+            if (!this._oColState[sLabel]) { this._oColState[sLabel] = {}; }
+            this._oColState[sLabel].sortDir = sKey;
 
-        onGoverningLawTokenUpdate: function (oEvent) {
-            var aRemoved = (oEvent.getParameter("removedTokens") || []).map(function (oToken) {
-                return oToken.getKey();
+            var sSortPath = _mColSortPaths[sLabel];
+            var oTable = this.byId("prTable");
+            var oBinding = oTable.getBinding("items");
+
+            oTable.getColumns().forEach(function (oCol) { oCol.setSortIndicator("None"); });
+
+            if (!sSortPath || sKey === "none") {
+                oBinding.sort([]);
+                return;
+            }
+
+            var oMatchCol = oTable.getColumns().find(function (oCol) {
+                var oHeader = oCol.getHeader();
+                return oHeader && oHeader.getText && oHeader.getText() === sLabel;
             });
-            this._applyFilters(aRemoved.length ? aRemoved : undefined);
+            if (oMatchCol) { oMatchCol.setSortIndicator(sKey === "asc" ? "Ascending" : "Descending"); }
+            oBinding.sort(new Sorter(sSortPath, sKey === "desc"));
         },
 
-        onAdaptFilters: function () {
-            if (!this._oAdaptFiltersDialog) {
-                Fragment.load({
-                    id: this.getView().getId(),
-                    name: "com.sap.ariba.l2purchaserequisition.view.AdaptFiltersDialog",
-                    controller: this
-                }).then(function (oDialog) {
-                    this._oAdaptFiltersDialog = oDialog;
-                    this.getView().addDependent(oDialog);
-                    oDialog.open();
-                }.bind(this));
-            } else {
-                this._oAdaptFiltersDialog.open();
-            }
+        onColSettingsGroupByChange: function (oEvent) {
+            var bGrouped = oEvent.getParameter("state");
+            var sLabel = this.getView().getModel("colSettings").getProperty("/columnLabel");
+            if (!this._oColState[sLabel]) { this._oColState[sLabel] = {}; }
+            this._oColState[sLabel].groupBy = bGrouped;
+            MessageToast.show("Group by " + sLabel + " — use the toolbar toggle instead");
         },
 
-        onToggleFilterVisibility: function (oEvent) {
-            var oBtn = oEvent.getSource();
-            var bNowVisible = oBtn.getPressed();
-
-            // Walk: eye ToggleButton → right HBox → outer HBox → left HBox → ComboBox
-            var oComboBox = oBtn.getParent().getParent().getItems()[0].getItems()[1];
-
-            oBtn.setIcon(bNowVisible ? "sap-icon://show" : "sap-icon://hide");
-
-            if (!bNowVisible) {
-                oComboBox.setValueState("Warning");
-                oComboBox.setValueStateText(
-                    oComboBox.getValue() ? "" : "If hidden and empty, this filter will be removed."
-                );
-            } else {
-                oComboBox.setValueState("None");
-                oComboBox.setValueStateText("");
-            }
+        onColSettingsWidthChange: function (oEvent) {
+            var nWidth = oEvent.getParameter("value");
+            var sLabel = this.getView().getModel("colSettings").getProperty("/columnLabel");
+            var oTable = this.byId("prTable");
+            var oMatchCol = oTable.getColumns().find(function (oCol) {
+                var oHeader = oCol.getHeader();
+                return oHeader && oHeader.getText && oHeader.getText() === sLabel;
+            });
+            if (oMatchCol) { oMatchCol.setWidth(nWidth + "px"); }
         },
 
-        onAdaptFiltersReset: function () {
-            MessageToast.show("Filters reset");
-        },
-
-        onAdaptFiltersOk: function () {
-            this._oAdaptFiltersDialog.close();
-        },
-
-        onAdaptFiltersFilter: function () {
-            this._oAdaptFiltersDialog.close();
-            MessageToast.show("Filters applied");
-        },
-
-        onAdaptFiltersCancel: function () {
-            this._oAdaptFiltersDialog.close();
-        },
-
-        // ---- Show/Hide Details (3-way: compact / show all / per-row) ----
+        // ---- Show/Hide Details ----
 
         onShowHideDetails: function (oEvent) {
             var sKey = oEvent.getParameter("item").getKey();
@@ -267,44 +325,28 @@ sap.ui.define([
             }
         },
 
-        // ---- Column Settings Popover ----
+        // ---- Toolbar actions ----
 
-        _onTableHeaderClick: function (oEvent) {
-            var oTH = oEvent.target.closest("th");
-            if (!oTH || !oTH.parentElement ||
-                !oTH.parentElement.classList.contains("sapMListTblHeader")) { return; }
-            var oTable = this.byId("prTable");
-            var aColumns = oTable.getColumns();
-            for (var i = 0; i < aColumns.length; i++) {
-                if (aColumns[i].getDomRef() === oTH) {
-                    this._openColSettings(aColumns[i]);
-                    return;
-                }
-            }
-        },
+        onImport: function () { MessageToast.show("Import — not yet implemented"); },
+        onImportFromTemplate: function () { MessageToast.show("Import from Template — not yet implemented"); },
+        onCopy: function () { MessageToast.show("Copy — not yet implemented"); },
+        onActivate: function () { MessageToast.show("Activate — not yet implemented"); },
+        onDeactivate: function () { MessageToast.show("Deactivate — not yet implemented"); },
+        onExport: function () { MessageToast.show("Export — not yet implemented"); },
+        onOverflow: function () { MessageToast.show("More — not yet implemented"); },
+        onBreadcrumbPress: function () { MessageToast.show("Home — not yet implemented"); },
+        onAdaptFilters: function () { MessageToast.show("Adapt Filters — not yet implemented"); },
+        onVariantSelect: function () {},
+        onVariantSave: function () {},
+        onVariantManage: function () {},
+        onColumnSettings: function () { this._openColSettings(); },
 
-        _openColSettings: function (oColumn) {
-            var oTable = this.byId("prTable");
+        // ---- Column Settings popover ----
 
-            var sLabel = oColumn.getHeader().getText();
-
-            // Initialise per-column state on first open, reading the rendered width from DOM
-            if (!this._oColState[sLabel]) {
-                var oColDom = oColumn.getDomRef();
-                var nWidthPx = oColDom ? Math.round(oColDom.getBoundingClientRect().width) : 160;
-                this._oColState[sLabel] = { sortDir: "none", groupBy: false, columnWidthPx: nWidthPx };
-            }
-
-            var _aPopoverCols = ["PR Title", "Status", "Requester", "Supplier"];
-            var oData = { columnLabel: sLabel, columnWidthPx: this._oColState[sLabel].columnWidthPx };
-            _aPopoverCols.forEach(function (sCol) {
-                var oS = this._oColState[sCol] || { sortDir: "none", groupBy: false };
-                oData["sort_" + sCol]  = oS.sortDir;
-                oData["group_" + sCol] = oS.groupBy;
-            }.bind(this));
-            this.getView().getModel("colSettings").setData(oData);
-
-            var oColDomRef = oColumn.getDomRef();
+        _openColSettings: function (sLabel) {
+            var that = this;
+            var sColLabel = sLabel || "";
+            this.getView().getModel("colSettings").setProperty("/columnLabel", sColLabel);
 
             if (!this._oColSettingsPopover) {
                 Fragment.load({
@@ -312,214 +354,60 @@ sap.ui.define([
                     name: "com.sap.ariba.l2purchaserequisition.view.ColumnSettingsPopover",
                     controller: this
                 }).then(function (oPopover) {
-                    this._oColSettingsPopover = oPopover;
-                    this.getView().addDependent(oPopover);
-                    oPopover.openBy(oColDomRef);
-                }.bind(this));
+                    that._oColSettingsPopover = oPopover;
+                    that.getView().addDependent(oPopover);
+                    oPopover.openBy(that.byId("prTable"));
+                });
             } else {
-                this._oColSettingsPopover.openBy(oColDomRef);
+                this._oColSettingsPopover.openBy(this.byId("prTable"));
             }
         },
 
-        onColSettingsSortChange: function (oEvent) {
-            var sKey   = oEvent.getParameter("item").getKey();
-            var sLabel = oEvent.getSource().getParent().getLabel();
+        _onTableHeaderClick: function (oEvent) {
+            var oTh = oEvent.target.closest("th.sapMListTblHeaderCell");
+            if (!oTh) { return; }
+            var sText = oTh.querySelector(".sapMText") && oTh.querySelector(".sapMText").textContent;
+            if (sText) { this._openColSettings(sText.trim()); }
+        },
 
-            if (!this._oColState[sLabel]) {
-                this._oColState[sLabel] = { sortDir: "none", groupBy: false, columnWidthPx: 160 };
-            }
-            this._oColState[sLabel].sortDir = sKey;
-            this.getView().getModel("colSettings").setProperty("/sort_" + sLabel, sKey);
+        // ---- Resize helpers ----
 
-            var oTable   = this.byId("prTable");
-            var oBinding = oTable.getBinding("items");
-
-            oTable.getColumns().forEach(function (oCol) {
-                oCol.setSortIndicator("None");
-            });
-
-            if (sKey === "none") {
-                oBinding.sort([]);
+        _syncAndRegisterResize: function (nAttempt) {
+            var oTable = this.byId("prTable");
+            var oTableDom = oTable && oTable.getDomRef();
+            if (!oTableDom && nAttempt < 10) {
+                setTimeout(this._syncAndRegisterResize.bind(this, nAttempt + 1), 50);
                 return;
             }
-
-            var sSortPath = _mColSortPaths[sLabel];
-            if (!sSortPath) { return; }
-
-            oBinding.sort(new Sorter(sSortPath, sKey === "desc"));
-
-            oTable.getColumns().forEach(function (oCol) {
-                var oHeader = oCol.getHeader();
-                if (oHeader && oHeader.getText && oHeader.getText() === sLabel) {
-                    oCol.setSortIndicator(sKey === "asc" ? "Ascending" : "Descending");
-                }
-            });
-        },
-
-        onColSettingsGroupByChange: function (oEvent) {
-            var bGrouped = oEvent.getParameter("state");
-            var sLabel   = oEvent.getSource().getParent().getLabel();
-            if (!this._oColState[sLabel]) {
-                this._oColState[sLabel] = { sortDir: "none", groupBy: false, columnWidthPx: 160 };
+            this._syncContextualWidth();
+            var oContentEl = oTableDom && oTableDom.closest(".sapFDynamicPageContent");
+            if (oContentEl && !this._sResizeHandlerId) {
+                this._sResizeHandlerId = ResizeHandler.register(oContentEl, this._syncContextualWidth.bind(this));
             }
-            this._oColState[sLabel].groupBy = bGrouped;
-            this.getView().getModel("colSettings").setProperty("/group_" + sLabel, bGrouped);
-            MessageToast.show(bGrouped ? sLabel + ": grouped" : sLabel + ": ungrouped");
         },
 
-        onColSettingsWidthChange: function (oEvent) {
-            var nWidth = oEvent.getSource().getValue();
-            var sLabel = this.getView().getModel("colSettings").getProperty("/columnLabel");
-            this._oColState[sLabel].columnWidthPx = nWidth;
-
+        _syncContextualWidth: function () {
             var oTable = this.byId("prTable");
-            oTable.getColumns().forEach(function (oCol) {
-                var oHeader = oCol.getHeader();
-                if (oHeader && oHeader.getText && oHeader.getText() === sLabel) {
-                    oCol.setWidth(nWidth + "px");
+            var oTableDom = oTable && oTable.getDomRef();
+            var oContentEl = oTableDom && oTableDom.closest(".sapFDynamicPageContent");
+            if (oContentEl) {
+                oTable.setContextualWidth(oContentEl.offsetWidth + "px");
+            }
+        },
+
+        _selectNavItem: function () {
+            var oNavList, oItem;
+            sap.ui.core.Element.registry.forEach(function (el) {
+                if (!oNavList && el.isA && el.isA("sap.tnt.NavigationList")) {
+                    oNavList = el;
+                }
+                if (!oItem && el.isA && el.isA("sap.tnt.NavigationListItem") && el.getText && el.getText() === "Contracts") {
+                    oItem = el;
                 }
             });
-        },
-
-        onColSettingsClose: function () {
-            if (this._oColSettingsPopover) {
-                this._oColSettingsPopover.close();
+            if (oNavList && oItem) {
+                oNavList.setSelectedItem(oItem);
             }
-        },
-
-        onColSettingsMore: function () {
-            MessageToast.show("More column settings — not yet implemented");
-        },
-
-        // ---- Row/Table Actions ----
-
-        onDelete: function () {
-            MessageToast.show("Delete — not yet implemented");
-        },
-
-        onTableActions: function () {
-            MessageToast.show("Actions — not yet implemented");
-        },
-
-        onExport: function () {
-            MessageToast.show("Export to Spreadsheet — not yet implemented");
-        },
-
-        // ---- Row Actions ----
-
-        onItemPress: function () {
-            window.location.href = "../L3-Ariba-Object-Page-Floorplan/";
-        },
-
-        onSupplierPress: function (oEvent) {
-            oEvent.preventDefault();
-            MessageToast.show("Supplier Quick View — not yet implemented");
-        },
-
-        onRequesterPress: function (oEvent) {
-            oEvent.preventDefault();
-            MessageToast.show("Contact Quick View — not yet implemented");
-        },
-
-        // ---- Page Actions ----
-
-        onCreate: function () {
-            MessageToast.show("Create Purchase Request — not yet implemented");
-        },
-
-        onCreateFromDocument: function () {
-            var oView = this.getView();
-            var fnOpen = function (oDialog) {
-                this.byId("createFromDocFileUploader").setValue("");
-                var oModel = oDialog.getModel("createFromDoc");
-                oModel.setProperty("/hasFile", false);
-                oModel.setProperty("/showEmpty", true);
-                oModel.setProperty("/fileName", "");
-                oModel.setProperty("/fileSize", "");
-                oDialog.open();
-            }.bind(this);
-
-            if (!this._oCreateFromDocDialog) {
-                Fragment.load({
-                    id: oView.getId(),
-                    name: "com.sap.ariba.l2purchaserequisition.view.CreateFromDocumentDialog",
-                    controller: this
-                }).then(function (oDialog) {
-                    this._oCreateFromDocDialog = oDialog;
-                    oView.addDependent(oDialog);
-                    oDialog.addStyleClass("sapUiSizeCompact");
-                    oDialog.setModel(new JSONModel({ hasFile: false, showEmpty: true, fileName: "", fileSize: "" }), "createFromDoc");
-                    fnOpen(oDialog);
-                }.bind(this));
-            } else {
-                fnOpen(this._oCreateFromDocDialog);
-            }
-        },
-
-        onCreateFromDocFileChange: function (oEvent) {
-            var sName  = oEvent.getParameter("newValue");
-            if (!sName) { return; }
-            var oFiles = oEvent.getParameter("files");
-            var nBytes = oFiles && oFiles[0] ? oFiles[0].size : 0;
-            var sSizeLabel = nBytes ? (nBytes / (1024 * 1024)).toFixed(1) + " Mb" : "";
-            var oModel = this._oCreateFromDocDialog.getModel("createFromDoc");
-            oModel.setProperty("/fileName", sName);
-            oModel.setProperty("/fileSize", sSizeLabel);
-            oModel.setProperty("/showEmpty", false);
-            oModel.setProperty("/hasFile", true);
-        },
-
-        onCreateFromDocRemoveFile: function () {
-            this.byId("createFromDocFileUploader").setValue("");
-            var oModel = this._oCreateFromDocDialog.getModel("createFromDoc");
-            oModel.setProperty("/hasFile", false);
-            oModel.setProperty("/showEmpty", true);
-            oModel.setProperty("/fileName", "");
-            oModel.setProperty("/fileSize", "");
-        },
-
-        onCreateFromDocReplace: function () {
-            var oFU = this.byId("createFromDocFileUploader");
-            if (oFU && oFU.oFileUpload) {
-                oFU.oFileUpload.click();
-            }
-        },
-
-        onCreateFromDocFileNamePress: function () {
-            MessageToast.show("File preview — not yet implemented");
-        },
-
-        onCreateFromDocContinue: function () {
-            this._oCreateFromDocDialog.close();
-            window.open(L3_URL, "_blank");
-        },
-
-        onCreateFromDocCancel: function () {
-            this._oCreateFromDocDialog.close();
-        },
-
-        onColumnSettings: function () {
-            MessageToast.show("Column Settings — not yet implemented");
-        },
-
-        onOverflow: function () {
-            MessageToast.show("More actions — not yet implemented");
-        },
-
-        onVariantSelect: function (oEvent) {
-            MessageToast.show("View: " + oEvent.getParameter("key"));
-        },
-
-        onVariantSave: function () {
-            MessageToast.show("View saved");
-        },
-
-        onVariantManage: function () {
-            MessageToast.show("Manage Views — not yet implemented");
-        },
-
-        onBreadcrumbPress: function (oEvent) {
-            MessageToast.show("Navigate: " + oEvent.getSource().getText());
         }
     });
 });
