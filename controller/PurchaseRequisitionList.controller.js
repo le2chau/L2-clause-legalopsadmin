@@ -124,7 +124,12 @@ sap.ui.define([
                             language:        oType.language,
                             status:          oType.status,
                             statusState:     oType.statusState,
+                            createdBy:       oType.createdBy,
+                            createdOn:       oType.createdOn,
+                            changedBy:       oType.changedBy,
                             changedOn:       oType.changedOn,
+                            description:     oType.description,
+                            clauseLanguage:  oType.clauseLanguage,
                             typeName:        oType.typeName,
                             typeVariant:     oType.typeVariant,
                             typeState:       oVariant.state,
@@ -208,6 +213,16 @@ sap.ui.define([
             oAppModel.setProperty("/selectedClauseTitle", oCtx.getProperty("clauseTitle"));
             oAppModel.setProperty("/selectedTypeName",    oCtx.getProperty("typeName"));
             oAppModel.setProperty("/selectedTypeVariant", oCtx.getProperty("typeVariant"));
+            oAppModel.setProperty("/selectedPageTitle",
+                oCtx.getProperty("clauseTitle") + " – " + oCtx.getProperty("typeName"));
+            oAppModel.setProperty("/selectedGoverningLaw", oCtx.getProperty("governingLaw"));
+            oAppModel.setProperty("/selectedLanguage",     oCtx.getProperty("language"));
+            oAppModel.setProperty("/selectedCreatedBy",    oCtx.getProperty("createdBy"));
+            oAppModel.setProperty("/selectedCreatedOn",    oCtx.getProperty("createdOn"));
+            oAppModel.setProperty("/selectedChangedBy",    oCtx.getProperty("changedBy"));
+            oAppModel.setProperty("/selectedChangedOn",    oCtx.getProperty("changedOn"));
+            oAppModel.setProperty("/selectedDescription",  oCtx.getProperty("description"));
+            oAppModel.setProperty("/selectedClauseLanguage", oCtx.getProperty("clauseLanguage"));
             oAppModel.setProperty("/layout", "TwoColumnsMidExpanded");
         },
 

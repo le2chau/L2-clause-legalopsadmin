@@ -24,6 +24,14 @@ sap.ui.define([
 
         onUploadAgreement: function () {
             MessageToast.show("Upload Agreement — not yet implemented");
+        },
+
+        onCreatedByPress: function () {
+            MessageToast.show("Created By — not yet implemented");
+        },
+
+        onChangedByPress: function () {
+            MessageToast.show("Changed By — not yet implemented");
         }
     });
 });

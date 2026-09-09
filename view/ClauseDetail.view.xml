@@ -5,6 +5,7 @@
     xmlns:f="sap.f"
     xmlns:uxap="sap.uxap"
     xmlns:layout="sap.ui.layout"
+    xmlns:suite="sap.suite.ui.commons"
     xmlns:form="sap.ui.layout.form"
     displayBlock="true"
 >
@@ -19,24 +20,23 @@
             <uxap:ObjectPageDynamicHeaderTitle>
 
                 <uxap:breadcrumbs>
-                    <Breadcrumbs currentLocationText="{app>/selectedTypeName}">
+                    <Breadcrumbs currentLocationText="{app>/selectedPageTitle}">
                         <Link text="Home" />
                         <Link text="Contract Management: Clauses" press=".onClose" />
-                        <Link text="{app>/selectedClauseTitle}" press=".onClose" />
                     </Breadcrumbs>
                 </uxap:breadcrumbs>
 
                 <uxap:expandedHeading>
                     <VBox>
-                        <Title text="{app>/selectedTypeName}" level="H2" />
-                        <Text text="{app>/selectedClauseTitle}" class="sapUiTinyMarginTop aribaObjectSubtitle" />
+                        <Title text="{app>/selectedPageTitle}" level="H2" />
+                        <Text text="{app>/selectedClauseId}" class="sapUiTinyMarginTop aribaObjectSubtitle" />
                     </VBox>
                 </uxap:expandedHeading>
 
                 <uxap:snappedHeading>
                     <VBox>
-                        <Title text="{app>/selectedTypeName}" level="H2" />
-                        <Text text="{app>/selectedClauseTitle}" class="sapUiTinyMarginTop aribaObjectSubtitle" />
+                        <Title text="{app>/selectedPageTitle}" level="H2" />
+                        <Text text="{app>/selectedClauseId}" class="sapUiTinyMarginTop aribaObjectSubtitle" />
                     </VBox>
                 </uxap:snappedHeading>
 
@@ -66,51 +66,44 @@
                 </VBox>
 
                 <VBox class="aribaHeaderFacet">
-                    <Label text="Contract Value" class="aribaFacetTitle" />
-                    <ObjectNumber
-                        number="1,250,000"
-                        unit="USD"
-                        class="aribaHeaderNumber sapMObjectNumberLarge"
-                    />
-                </VBox>
-
-                <VBox class="aribaHeaderFacet">
-                    <Label text="Key Dates" class="aribaFacetTitle" />
-                    <ObjectAttribute title="Effective" text="Jan 1, 2024" />
-                    <ObjectAttribute title="Expires" text="Dec 31, 2026" />
+                    <Label text="Linked Templates" class="aribaFacetTitle" />
+                    <Tokenizer width="300px" editable="false">
+                        <Token text="Statement of Work Template" />
+                        <Token text="Service Agreement Template" />
+                        <Token text="Master Services Agreement" />
+                    </Tokenizer>
                 </VBox>
 
                 <VBox class="aribaHeaderFacet">
                     <Label text="Lifecycle Phase" class="aribaFacetTitle" />
-                    <layout:HorizontalLayout>
-                        <Button icon="sap-icon://create" type="Transparent" tooltip="Draft" />
-                        <Button icon="sap-icon://check-availability" type="Transparent" tooltip="Review" />
-                        <Button icon="sap-icon://compare" type="Transparent" tooltip="Negotiate" />
-                        <Button icon="sap-icon://request" type="Transparent" tooltip="Approve" />
-                        <Button icon="sap-icon://accept" type="Transparent" tooltip="Execute" />
-                    </layout:HorizontalLayout>
+                    <suite:MicroProcessFlow>
+                        <suite:content>
+                            <suite:MicroProcessFlowItem icon="sap-icon://create"             title="Draft"     state="Success" />
+                            <suite:MicroProcessFlowItem icon="sap-icon://check-availability" title="Review"    state="Success" />
+                            <suite:MicroProcessFlowItem icon="sap-icon://compare"            title="Negotiate" state="Warning" />
+                            <suite:MicroProcessFlowItem icon="sap-icon://request"            title="Approve"   state="None" />
+                            <suite:MicroProcessFlowItem icon="sap-icon://accept"             title="Execute"   state="None" />
+                        </suite:content>
+                    </suite:MicroProcessFlow>
+                </VBox>
+
+                <VBox class="aribaHeaderFacet" width="280px">
+                    <Label text="Description" class="aribaFacetTitle" />
+                    <Text text="{app>/selectedDescription}" maxLines="5" />
                 </VBox>
 
                 <VBox class="aribaHeaderFacet">
-                    <Label text="Time to Expiry" class="aribaFacetTitle" />
-                    <ProgressIndicator
-                        percentValue="75"
-                        displayValue="90 days remaining"
-                        state="Warning"
-                        width="14rem"
-                    />
+                    <Label text="Governing Law" class="aribaFacetTitle" />
+                    <ObjectAttribute title="Governing Law" text="{app>/selectedGoverningLaw}" />
+                    <ObjectAttribute title="Language"      text="{app>/selectedLanguage}" />
                 </VBox>
 
                 <VBox class="aribaHeaderFacet">
-                    <Label text="Parties" class="aribaFacetTitle" />
-                    <ObjectAttribute title="Buyer" text="Acme Corporation" />
-                    <ObjectAttribute title="Supplier" text="Global Supplies Inc." />
-                </VBox>
-
-                <VBox class="aribaHeaderFacet">
-                    <Label text="Category" class="aribaFacetTitle" />
-                    <ObjectAttribute title="Type" text="{app>/selectedTypeVariant}" />
-                    <ObjectAttribute title="Clause" text="{app>/selectedClauseTitle}" />
+                    <Label text="Audit" class="aribaFacetTitle" />
+                    <ObjectAttribute title="Created By" text="{app>/selectedCreatedBy}" active="true" press=".onCreatedByPress" />
+                    <ObjectAttribute title="Created On" text="{app>/selectedCreatedOn}" />
+                    <ObjectAttribute title="Changed By" text="{app>/selectedChangedBy}" active="true" press=".onChangedByPress" />
+                    <ObjectAttribute title="Changed On" text="{app>/selectedChangedOn}" />
                 </VBox>
 
             </HeaderContainer>
@@ -138,177 +131,12 @@
                             columnsM="1"
                         >
                             <form:content>
-                                <Label text="Clause Title" />
-                                <Text text="{app>/selectedClauseTitle}" />
                                 <Label text="Type" />
                                 <Text text="{app>/selectedTypeName}" />
-                                <Label text="Contract Hierarchy" />
-                                <Text text="Master Agreement > Work Order > Statement of Work" />
-                                <Label text="Contract Description" />
-                                <Text text="This clause defines the standard terms applicable to all transactions under this agreement. It establishes the baseline conditions for compliance and performance measurement." />
+                                <Label text="Clause Language" />
+                                <FormattedText class="aribaClauseLanguage" htmlText="{app>/selectedClauseLanguage}" />
                             </form:content>
                         </form:SimpleForm>
-                    </uxap:ObjectPageSubSection>
-                </uxap:subSections>
-            </uxap:ObjectPageSection>
-
-            <!-- Contract Template -->
-            <uxap:ObjectPageSection id="detailSectionTemplate" title="Contract Template">
-                <uxap:subSections>
-                    <uxap:ObjectPageSubSection title="">
-                        <Panel class="aribaTemplatePanel">
-                            <content>
-                                <HBox alignItems="Center" justifyContent="SpaceBetween" class="sapUiSmallMargin">
-                                    <HBox alignItems="Center">
-                                        <Avatar
-                                            icon="sap-icon://crm-service-manager"
-                                            displayShape="Square"
-                                            displaySize="M"
-                                            backgroundColor="TileIcon"
-                                            class="sapUiSmallMarginEnd aribaTemplateAvatar"
-                                        />
-                                        <VBox>
-                                            <Title text="Standard Clause Template v2.1" level="H5" />
-                                            <Text text="CT-2024-001" class="sapUiTinyMarginTop" />
-                                            <Text text="Approved template for standard commercial agreements including payment and liability clauses." class="sapUiTinyMarginTop" width="40rem" />
-                                        </VBox>
-                                    </HBox>
-                                    <Button
-                                        text="Change Template"
-                                        type="Transparent"
-                                        press=".onChangeTemplate"
-                                    />
-                                </HBox>
-                            </content>
-                        </Panel>
-                    </uxap:ObjectPageSubSection>
-                </uxap:subSections>
-            </uxap:ObjectPageSection>
-
-            <!-- Legal Agreement -->
-            <uxap:ObjectPageSection id="detailSectionLegalAgreement" title="Legal Agreement">
-                <uxap:subSections>
-                    <uxap:ObjectPageSubSection title="">
-                        <VBox width="100%">
-                            <layout:Grid defaultSpan="L3 M6 S12" class="sapUiSmallMarginTop sapUiSmallMarginBottom">
-                                <layout:content>
-                                    <VBox>
-                                        <Label text="Governing Law" />
-                                        <Text text="New York, USA" class="sapUiTinyMarginTop" />
-                                    </VBox>
-                                    <VBox>
-                                        <Label text="Language" />
-                                        <Text text="English" class="sapUiTinyMarginTop" />
-                                    </VBox>
-                                </layout:content>
-                            </layout:Grid>
-                            <Panel class="aribaTemplatePanel sapUiMediumMarginTop" width="100%">
-                                <content>
-                                    <IllustratedMessage
-                                        illustrationType="sapIllus-SearchEarth"
-                                        title="No legal agreement added yet"
-                                        description="You can add a legal agreement either by choosing to create a new agreement from a template or by uploading an existing legal agreement file."
-                                    >
-                                        <additionalContent>
-                                            <Button text="Choose a Template" type="Emphasized" press=".onChooseTemplate" />
-                                            <Button text="Upload Agreement" type="Default" press=".onUploadAgreement" class="sapUiTinyMarginBegin" />
-                                        </additionalContent>
-                                    </IllustratedMessage>
-                                </content>
-                            </Panel>
-                        </VBox>
-                    </uxap:ObjectPageSubSection>
-                </uxap:subSections>
-            </uxap:ObjectPageSection>
-
-            <!-- Attachments -->
-            <uxap:ObjectPageSection id="detailSectionAttachments" title="Attachments (0)">
-                <uxap:subSections>
-                    <uxap:ObjectPageSubSection title="">
-                        <IllustratedMessage
-                            illustrationType="sapIllus-NoData"
-                            title="No Attachments"
-                            description="Upload files to attach them to this clause."
-                        />
-                    </uxap:ObjectPageSubSection>
-                </uxap:subSections>
-            </uxap:ObjectPageSection>
-
-            <!-- Compliance Terms -->
-            <uxap:ObjectPageSection id="detailSectionComplianceTerms" title="Compliance Terms">
-                <uxap:subSections>
-                    <uxap:ObjectPageSubSection title="Consumption and Integration">
-                        <VBox width="100%">
-                            <layout:Grid defaultSpan="L3 M6 S12" class="sapUiSmallMarginTop sapUiSmallMarginBottom">
-                                <layout:content>
-                                    <VBox>
-                                        <Label text="Consumption Method" />
-                                        <Text text="Direct Purchase" class="sapUiTinyMarginTop" />
-                                    </VBox>
-                                </layout:content>
-                            </layout:Grid>
-                            <layout:Grid defaultSpan="L3 M6 S12" class="sapUiSmallMarginBottom">
-                                <layout:content>
-                                    <VBox>
-                                        <Label text="Purchasing Organization" />
-                                        <Text text="AMER Procurement" class="sapUiTinyMarginTop" />
-                                    </VBox>
-                                    <VBox>
-                                        <Label text="Company Code" />
-                                        <Text text="1000" class="sapUiTinyMarginTop" />
-                                    </VBox>
-                                    <VBox>
-                                        <Label text="Payment Terms" />
-                                        <Text text="Net 30" class="sapUiTinyMarginTop" />
-                                    </VBox>
-                                </layout:content>
-                            </layout:Grid>
-                        </VBox>
-                    </uxap:ObjectPageSubSection>
-                    <uxap:ObjectPageSubSection title="Terms and Limits">
-                        <layout:Grid defaultSpan="L3 M6 S12" class="sapUiSmallMarginTop sapUiSmallMarginBottom">
-                            <layout:content>
-                                <VBox>
-                                    <Label text="Consumption Scope" />
-                                    <Text text="Global" class="sapUiTinyMarginTop" />
-                                </VBox>
-                                <VBox>
-                                    <Label text="Limit Type" />
-                                    <Text text="Maximum Value" class="sapUiTinyMarginTop" />
-                                </VBox>
-                                <VBox>
-                                    <Label text="Maximum Limit / Currency" />
-                                    <Text text="5,000,000 / USD" class="sapUiTinyMarginTop" />
-                                </VBox>
-                            </layout:content>
-                        </layout:Grid>
-                    </uxap:ObjectPageSubSection>
-                </uxap:subSections>
-            </uxap:ObjectPageSection>
-
-            <!-- Items -->
-            <uxap:ObjectPageSection id="detailSectionItems" title="Items (0)">
-                <uxap:subSections>
-                    <uxap:ObjectPageSubSection title="">
-                        <IllustratedMessage illustrationType="sapIllus-NoData" title="No Items" description="No items have been added to this clause." />
-                    </uxap:ObjectPageSubSection>
-                </uxap:subSections>
-            </uxap:ObjectPageSection>
-
-            <!-- Teams -->
-            <uxap:ObjectPageSection id="detailSectionTeams" title="Teams (0)">
-                <uxap:subSections>
-                    <uxap:ObjectPageSubSection title="">
-                        <IllustratedMessage illustrationType="sapIllus-NoData" title="No Teams" description="No teams have been assigned to this clause." />
-                    </uxap:ObjectPageSubSection>
-                </uxap:subSections>
-            </uxap:ObjectPageSection>
-
-            <!-- Tasks -->
-            <uxap:ObjectPageSection id="detailSectionTasks" title="Tasks (0)">
-                <uxap:subSections>
-                    <uxap:ObjectPageSubSection title="">
-                        <IllustratedMessage illustrationType="sapIllus-NoData" title="No Tasks" description="No tasks have been created for this clause." />
                     </uxap:ObjectPageSubSection>
                 </uxap:subSections>
             </uxap:ObjectPageSection>

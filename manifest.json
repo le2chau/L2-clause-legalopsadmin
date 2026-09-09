@@ -32,7 +32,8 @@
                 "sap.tnt": {},
                 "sap.ui.core": {},
                 "sap.uxap": {},
-                "sap.ui.layout": {}
+                "sap.ui.layout": {},
+                "sap.suite.ui.commons": {}
             }
         },
         "contentDensities": {

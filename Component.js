@@ -17,7 +17,16 @@ sap.ui.define([
                 selectedClauseId: null,
                 selectedClauseTitle: "",
                 selectedTypeName: "",
-                selectedTypeVariant: ""
+                selectedTypeVariant: "",
+                selectedPageTitle: "",
+                selectedGoverningLaw: "",
+                selectedLanguage: "",
+                selectedCreatedBy: "",
+                selectedCreatedOn: "",
+                selectedChangedBy: "",
+                selectedChangedOn: "",
+                selectedDescription: "",
+                selectedClauseLanguage: ""
             }), "app");
         }
     });
