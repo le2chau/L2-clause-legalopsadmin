@@ -248,7 +248,6 @@
                                 <!-- Clause title + subtitle -->
                                 <VBox visible="{display>isClause}" class="aribaClauseTitleBox">
                                     <Title text="{display>title}" level="H6" wrapping="false" class="aribaClauseTitle" />
-                                    <Text text="{display>subtitle}" class="aribaClauseSubtitle" />
                                 </VBox>
                                 <!-- Type name + subtitle (visible on type rows) -->
                                 <VBox visible="{display>isType}" class="aribaTypeNameBox">

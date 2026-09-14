@@ -14,6 +14,18 @@ sap.ui.define([
             MessageToast.show("More options — not yet implemented");
         },
 
+        onEdit: function () {
+            MessageToast.show("Edit — not yet implemented");
+        },
+
+        onActivate: function () {
+            MessageToast.show("Activate — not yet implemented");
+        },
+
+        onCopy: function () {
+            MessageToast.show("Copy — not yet implemented");
+        },
+
         onChangeTemplate: function () {
             MessageToast.show("Change Template — not yet implemented");
         },

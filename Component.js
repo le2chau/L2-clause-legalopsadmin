@@ -26,7 +26,9 @@ sap.ui.define([
                 selectedChangedBy: "",
                 selectedChangedOn: "",
                 selectedDescription: "",
-                selectedClauseLanguage: ""
+                selectedClauseLanguage: "",
+                selectedTags: [],
+                selectedVersion: 0
             }), "app");
         }
     });

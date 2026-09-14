@@ -41,8 +41,11 @@
                 </uxap:snappedHeading>
 
                 <uxap:actions>
-                    <Button icon="sap-icon://decline" press=".onClose" tooltip="Close" type="Transparent" />
+                    <Button text="Edit" press=".onEdit" type="Emphasized" />
+                    <Button text="Activate" press=".onActivate" type="Default" />
+                    <Button text="Copy" press=".onCopy" type="Default" />
                     <Button icon="sap-icon://overflow" press=".onMore" tooltip="More Options" type="Transparent" />
+                    <Button icon="sap-icon://decline" press=".onClose" tooltip="Close" type="Transparent" />
                 </uxap:actions>
 
             </uxap:ObjectPageDynamicHeaderTitle>
@@ -75,6 +78,11 @@
                 </VBox>
 
                 <VBox class="aribaHeaderFacet">
+                    <Label text="Version" class="aribaFacetTitle" />
+                    <Text text="{app>/selectedVersion}" class="versionValue" />
+                </VBox>
+
+                <VBox class="aribaHeaderFacet">
                     <Label text="Lifecycle Phase" class="aribaFacetTitle" />
                     <suite:MicroProcessFlow>
                         <suite:content>
@@ -90,12 +98,6 @@
                 <VBox class="aribaHeaderFacet" width="280px">
                     <Label text="Description" class="aribaFacetTitle" />
                     <Text text="{app>/selectedDescription}" maxLines="5" />
-                </VBox>
-
-                <VBox class="aribaHeaderFacet">
-                    <Label text="Governing Law" class="aribaFacetTitle" />
-                    <ObjectAttribute title="Governing Law" text="{app>/selectedGoverningLaw}" />
-                    <ObjectAttribute title="Language"      text="{app>/selectedLanguage}" />
                 </VBox>
 
                 <VBox class="aribaHeaderFacet">
@@ -131,6 +133,17 @@
                             columnsM="1"
                         >
                             <form:content>
+                                <Label text="Governing Law" />
+                                <Text text="{app>/selectedGoverningLaw}" />
+                                <Label text="Language" />
+                                <Text text="{app>/selectedLanguage}" />
+                                <Label text="Tags" />
+                                <Tokenizer editable="false"
+                                           tokens="{path: 'app>/selectedTags', templateShareable: false}">
+                                    <tokens>
+                                        <Token text="{app>}" deletable="false" />
+                                    </tokens>
+                                </Tokenizer>
                                 <Label text="Type" />
                                 <Text text="{app>/selectedTypeName}" />
                                 <Label text="Clause Language" />

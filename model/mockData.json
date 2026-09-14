@@ -24,7 +24,9 @@
                     "changedBy": "John Doe",
                     "changedOn": "Oct 28, 2025",
                     "description": "Use this clause for standard net-30 payment terms applicable to all domestic vendor transactions. Governs invoicing schedules, dispute resolution timelines, and early-payment discount provisions under applicable law. Applies where no preferred or fallback variant has been negotiated.",
-                    "clauseLanguage": "Payment shall be due within <span class='aribaPlaceholder'>NET_DAYS</span> days of the invoice date. <span class='aribaPlaceholder'>PARTY_A</span> shall remit funds to <span class='aribaPlaceholder'>PARTY_B</span> by electronic transfer to the account designated in writing. Invoices unpaid after <span class='aribaPlaceholder'>NET_DAYS</span> days shall be subject to a late fee as specified in the Late Payment clause. This clause is governed by the laws of <span class='aribaPlaceholder'>GOVERNING_LAW</span> and is effective as of <span class='aribaPlaceholder'>EFFECTIVE_DATE</span>."
+                    "clauseLanguage": "Payment shall be due within <span class='aribaPlaceholder'>NET_DAYS</span> days of the invoice date. <span class='aribaPlaceholder'>PARTY_A</span> shall remit funds to <span class='aribaPlaceholder'>PARTY_B</span> by electronic transfer to the account designated in writing. Invoices unpaid after <span class='aribaPlaceholder'>NET_DAYS</span> days shall be subject to a late fee as specified in the Late Payment clause. This clause is governed by the laws of <span class='aribaPlaceholder'>GOVERNING_LAW</span> and is effective as of <span class='aribaPlaceholder'>EFFECTIVE_DATE</span>.",
+                    "tags": ["Financial", "Net-30", "Domestic"],
+                    "version": 3
                 },
                 {
                     "clauseId": "CL-001",
@@ -39,7 +41,9 @@
                     "changedBy": "Anna Müller",
                     "changedOn": "Oct 26, 2025",
                     "description": "Preferred terms for strategic EU vendors. Allows net-45 with early-payment incentive.",
-                    "clauseLanguage": "Der Rechnungsbetrag ist innerhalb von <span class='aribaPlaceholder'>NET_DAYS</span> Tagen nach Rechnungsdatum durch <span class='aribaPlaceholder'>PARTY_A</span> auf das von <span class='aribaPlaceholder'>PARTY_B</span> schriftlich benannte Konto zu überweisen. Bei vorzeitiger Zahlung innerhalb von <span class='aribaPlaceholder'>EARLY_PAYMENT_DAYS</span> Tagen gewährt <span class='aribaPlaceholder'>PARTY_B</span> einen Skonto von <span class='aribaPlaceholder'>DISCOUNT_RATE</span>%. Diese Klausel unterliegt dem Recht von <span class='aribaPlaceholder'>GOVERNING_LAW</span> und tritt am <span class='aribaPlaceholder'>EFFECTIVE_DATE</span> in Kraft."
+                    "clauseLanguage": "Der Rechnungsbetrag ist innerhalb von <span class='aribaPlaceholder'>NET_DAYS</span> Tagen nach Rechnungsdatum durch <span class='aribaPlaceholder'>PARTY_A</span> auf das von <span class='aribaPlaceholder'>PARTY_B</span> schriftlich benannte Konto zu überweisen. Bei vorzeitiger Zahlung innerhalb von <span class='aribaPlaceholder'>EARLY_PAYMENT_DAYS</span> Tagen gewährt <span class='aribaPlaceholder'>PARTY_B</span> einen Skonto von <span class='aribaPlaceholder'>DISCOUNT_RATE</span>%. Diese Klausel unterliegt dem Recht von <span class='aribaPlaceholder'>GOVERNING_LAW</span> und tritt am <span class='aribaPlaceholder'>EFFECTIVE_DATE</span> in Kraft.",
+                    "tags": ["Financial", "Net-45", "Early Payment", "EU"],
+                    "version": 2
                 },
                 {
                     "clauseId": "CL-001",
@@ -54,7 +58,9 @@
                     "changedBy": "Sarah Chen",
                     "changedOn": "Oct 12, 2025",
                     "description": "Fallback clause for APAC region when standard terms cannot be applied. Subject to local regulatory review before execution.",
-                    "clauseLanguage": "Unless otherwise agreed in writing, <span class='aribaPlaceholder'>PARTY_A</span> shall pay all invoices submitted by <span class='aribaPlaceholder'>PARTY_B</span> within <span class='aribaPlaceholder'>NET_DAYS</span> calendar days of receipt. Payments shall be made in <span class='aribaPlaceholder'>CURRENCY</span> to the bank account specified by <span class='aribaPlaceholder'>PARTY_B</span>. This clause is effective from <span class='aribaPlaceholder'>EFFECTIVE_DATE</span> and governed by <span class='aribaPlaceholder'>GOVERNING_LAW</span>. Local regulatory requirements may apply and shall take precedence where mandated."
+                    "clauseLanguage": "Unless otherwise agreed in writing, <span class='aribaPlaceholder'>PARTY_A</span> shall pay all invoices submitted by <span class='aribaPlaceholder'>PARTY_B</span> within <span class='aribaPlaceholder'>NET_DAYS</span> calendar days of receipt. Payments shall be made in <span class='aribaPlaceholder'>CURRENCY</span> to the bank account specified by <span class='aribaPlaceholder'>PARTY_B</span>. This clause is effective from <span class='aribaPlaceholder'>EFFECTIVE_DATE</span> and governed by <span class='aribaPlaceholder'>GOVERNING_LAW</span>. Local regulatory requirements may apply and shall take precedence where mandated.",
+                    "tags": ["Financial", "APAC", "Regulatory"],
+                    "version": 1
                 }
             ]
         },
@@ -82,7 +88,9 @@
                     "changedBy": "Sarah Chen",
                     "changedOn": "Oct 20, 2025",
                     "description": "Defines penalty interest rates applied to overdue invoices. Use when a supplier has exceeded the agreed payment window and a late fee must be formally assessed per the master agreement.",
-                    "clauseLanguage": "Any amount not paid by <span class='aribaPlaceholder'>PARTY_A</span> by the due date shall accrue interest at a rate of <span class='aribaPlaceholder'>INTEREST_RATE</span>% per annum, calculated daily from the date payment was due until the date of actual payment. <span class='aribaPlaceholder'>PARTY_B</span> reserves the right to suspend services after <span class='aribaPlaceholder'>GRACE_PERIOD</span> days of non-payment, provided written notice has been issued. This clause is effective as of <span class='aribaPlaceholder'>EFFECTIVE_DATE</span> under the laws of <span class='aribaPlaceholder'>GOVERNING_LAW</span>."
+                    "clauseLanguage": "Any amount not paid by <span class='aribaPlaceholder'>PARTY_A</span> by the due date shall accrue interest at a rate of <span class='aribaPlaceholder'>INTEREST_RATE</span>% per annum, calculated daily from the date payment was due until the date of actual payment. <span class='aribaPlaceholder'>PARTY_B</span> reserves the right to suspend services after <span class='aribaPlaceholder'>GRACE_PERIOD</span> days of non-payment, provided written notice has been issued. This clause is effective as of <span class='aribaPlaceholder'>EFFECTIVE_DATE</span> under the laws of <span class='aribaPlaceholder'>GOVERNING_LAW</span>.",
+                    "tags": ["Financial", "Penalty", "Overdue"],
+                    "version": 4
                 },
                 {
                     "clauseId": "CL-002",
@@ -97,7 +105,9 @@
                     "changedBy": "Anna Müller",
                     "changedOn": "Oct 18, 2025",
                     "description": "EU preferred terms with reduced penalty rates for long-term strategic partners.",
-                    "clauseLanguage": "Verzugszinsen werden ab dem Fälligkeitsdatum in Höhe von <span class='aribaPlaceholder'>INTEREST_RATE</span>% p.a. auf den ausstehenden Betrag berechnet. <span class='aribaPlaceholder'>PARTY_B</span> behält sich vor, Leistungen nach <span class='aribaPlaceholder'>GRACE_PERIOD</span> Tagen Zahlungsverzug durch <span class='aribaPlaceholder'>PARTY_A</span> vorübergehend einzustellen, sofern eine schriftliche Mahnung ergangen ist. Für strategische Partner gilt ein reduzierter Zinssatz gemäß gesonderter Vereinbarung. Maßgebliches Recht: <span class='aribaPlaceholder'>GOVERNING_LAW</span>. Wirksam ab <span class='aribaPlaceholder'>EFFECTIVE_DATE</span>."
+                    "clauseLanguage": "Verzugszinsen werden ab dem Fälligkeitsdatum in Höhe von <span class='aribaPlaceholder'>INTEREST_RATE</span>% p.a. auf den ausstehenden Betrag berechnet. <span class='aribaPlaceholder'>PARTY_B</span> behält sich vor, Leistungen nach <span class='aribaPlaceholder'>GRACE_PERIOD</span> Tagen Zahlungsverzug durch <span class='aribaPlaceholder'>PARTY_A</span> vorübergehend einzustellen, sofern eine schriftliche Mahnung ergangen ist. Für strategische Partner gilt ein reduzierter Zinssatz gemäß gesonderter Vereinbarung. Maßgebliches Recht: <span class='aribaPlaceholder'>GOVERNING_LAW</span>. Wirksam ab <span class='aribaPlaceholder'>EFFECTIVE_DATE</span>.",
+                    "tags": ["Financial", "Penalty", "Strategic Partner", "EU"],
+                    "version": 2
                 }
             ]
         },
@@ -125,7 +135,9 @@
                     "changedBy": "John Doe",
                     "changedOn": "Oct 15, 2025",
                     "description": "Standard global pricing clause covering list price, discount tiers, and currency adjustment mechanisms. Use for all supplier agreements where price stability over the contract term must be contractually guaranteed.",
-                    "clauseLanguage": "The prices set forth in Schedule A shall remain fixed for the duration of the <span class='aribaPlaceholder'>CONTRACT_TERM</span> period commencing <span class='aribaPlaceholder'>EFFECTIVE_DATE</span>. <span class='aribaPlaceholder'>PARTY_B</span> may revise list prices upon <span class='aribaPlaceholder'>NOTICE_PERIOD</span> days' prior written notice to <span class='aribaPlaceholder'>PARTY_A</span>, subject to a maximum annual increase of <span class='aribaPlaceholder'>PRICE_CAP_PCT</span>%. All prices are exclusive of applicable taxes, duties, and levies unless otherwise expressly stated. This clause is governed by <span class='aribaPlaceholder'>GOVERNING_LAW</span>."
+                    "clauseLanguage": "The prices set forth in Schedule A shall remain fixed for the duration of the <span class='aribaPlaceholder'>CONTRACT_TERM</span> period commencing <span class='aribaPlaceholder'>EFFECTIVE_DATE</span>. <span class='aribaPlaceholder'>PARTY_B</span> may revise list prices upon <span class='aribaPlaceholder'>NOTICE_PERIOD</span> days' prior written notice to <span class='aribaPlaceholder'>PARTY_A</span>, subject to a maximum annual increase of <span class='aribaPlaceholder'>PRICE_CAP_PCT</span>%. All prices are exclusive of applicable taxes, duties, and levies unless otherwise expressly stated. This clause is governed by <span class='aribaPlaceholder'>GOVERNING_LAW</span>.",
+                    "tags": ["Financial", "Price Stability", "Global"],
+                    "version": 2
                 }
             ]
         },
@@ -153,7 +165,9 @@
                     "changedBy": "John Doe",
                     "changedOn": "Oct 28, 2025",
                     "description": "Caps liability at the total value of fees paid in the prior 12 months. Apply when negotiating with vendors whose services carry operational risk. Not for use in agreements involving personal data processing or critical infrastructure.",
-                    "clauseLanguage": "In no event shall either party be liable to the other for any indirect, incidental, special, punitive, or consequential damages, including loss of profits or data, arising out of or related to this Agreement. The aggregate liability of <span class='aribaPlaceholder'>PARTY_B</span> to <span class='aribaPlaceholder'>PARTY_A</span> under this Agreement shall not exceed <span class='aribaPlaceholder'>LIABILITY_CAP</span>, being the total fees paid in the twelve months preceding the event giving rise to the claim. This limitation applies regardless of the form of action and shall survive termination of this Agreement. Effective as of <span class='aribaPlaceholder'>EFFECTIVE_DATE</span> under <span class='aribaPlaceholder'>GOVERNING_LAW</span>."
+                    "clauseLanguage": "In no event shall either party be liable to the other for any indirect, incidental, special, punitive, or consequential damages, including loss of profits or data, arising out of or related to this Agreement. The aggregate liability of <span class='aribaPlaceholder'>PARTY_B</span> to <span class='aribaPlaceholder'>PARTY_A</span> under this Agreement shall not exceed <span class='aribaPlaceholder'>LIABILITY_CAP</span>, being the total fees paid in the twelve months preceding the event giving rise to the claim. This limitation applies regardless of the form of action and shall survive termination of this Agreement. Effective as of <span class='aribaPlaceholder'>EFFECTIVE_DATE</span> under <span class='aribaPlaceholder'>GOVERNING_LAW</span>.",
+                    "tags": ["Liability", "Risk Management", "Cap"],
+                    "version": 5
                 },
                 {
                     "clauseId": "CL-004",
@@ -168,7 +182,9 @@
                     "changedBy": "Anna Müller",
                     "changedOn": "Oct 25, 2025",
                     "description": "EU-compliant preferred terms with higher liability cap for strategic partners.",
-                    "clauseLanguage": "Die Haftung von <span class='aribaPlaceholder'>PARTY_B</span> gegenüber <span class='aribaPlaceholder'>PARTY_A</span> ist auf <span class='aribaPlaceholder'>LIABILITY_CAP</span> begrenzt, entsprechend den in den vorangegangenen zwölf Monaten gezahlten Vergütungen. Eine Haftung für mittelbare Schäden, entgangenen Gewinn oder Datenverlust ist ausgeschlossen, soweit gesetzlich zulässig. Für strategische Partner gilt eine erhöhte Haftungsgrenze gemäß gesonderter Anlage. Diese Klausel unterliegt dem Recht von <span class='aribaPlaceholder'>GOVERNING_LAW</span> und gilt ab <span class='aribaPlaceholder'>EFFECTIVE_DATE</span>."
+                    "clauseLanguage": "Die Haftung von <span class='aribaPlaceholder'>PARTY_B</span> gegenüber <span class='aribaPlaceholder'>PARTY_A</span> ist auf <span class='aribaPlaceholder'>LIABILITY_CAP</span> begrenzt, entsprechend den in den vorangegangenen zwölf Monaten gezahlten Vergütungen. Eine Haftung für mittelbare Schäden, entgangenen Gewinn oder Datenverlust ist ausgeschlossen, soweit gesetzlich zulässig. Für strategische Partner gilt eine erhöhte Haftungsgrenze gemäß gesonderter Anlage. Diese Klausel unterliegt dem Recht von <span class='aribaPlaceholder'>GOVERNING_LAW</span> und gilt ab <span class='aribaPlaceholder'>EFFECTIVE_DATE</span>.",
+                    "tags": ["Liability", "Strategic Partner", "EU", "Cap"],
+                    "version": 3
                 },
                 {
                     "clauseId": "CL-004",
@@ -183,7 +199,9 @@
                     "changedBy": "John Doe",
                     "changedOn": "Oct 22, 2025",
                     "description": "Fallback liability cap for situations where standard terms are rejected in negotiation.",
-                    "clauseLanguage": "Notwithstanding any other provision of this Agreement, neither party shall be liable for any punitive or exemplary damages. The total liability of either party shall be capped at <span class='aribaPlaceholder'>LIABILITY_CAP</span> in aggregate across all claims under this Agreement. <span class='aribaPlaceholder'>PARTY_A</span> and <span class='aribaPlaceholder'>PARTY_B</span> acknowledge this limitation as a reasonable and agreed allocation of commercial risk. Effective <span class='aribaPlaceholder'>EFFECTIVE_DATE</span>, governed by <span class='aribaPlaceholder'>GOVERNING_LAW</span>."
+                    "clauseLanguage": "Notwithstanding any other provision of this Agreement, neither party shall be liable for any punitive or exemplary damages. The total liability of either party shall be capped at <span class='aribaPlaceholder'>LIABILITY_CAP</span> in aggregate across all claims under this Agreement. <span class='aribaPlaceholder'>PARTY_A</span> and <span class='aribaPlaceholder'>PARTY_B</span> acknowledge this limitation as a reasonable and agreed allocation of commercial risk. Effective <span class='aribaPlaceholder'>EFFECTIVE_DATE</span>, governed by <span class='aribaPlaceholder'>GOVERNING_LAW</span>.",
+                    "tags": ["Liability", "Cap", "Negotiated"],
+                    "version": 1
                 }
             ]
         },
@@ -211,7 +229,9 @@
                     "changedBy": "Sarah Chen",
                     "changedOn": "Oct 15, 2025",
                     "description": "Standard indemnification clause covering third-party IP claims and data breaches. Use for all SaaS and technology service agreements. Review with legal before applying to agreements with non-standard data handling terms.",
-                    "clauseLanguage": "<span class='aribaPlaceholder'>PARTY_A</span> shall indemnify, defend, and hold harmless <span class='aribaPlaceholder'>PARTY_B</span> and its officers, directors, employees, and agents from and against any and all claims, damages, losses, costs, and expenses (including reasonable attorneys' fees) arising out of or relating to <span class='aribaPlaceholder'>PARTY_A</span>'s material breach of this Agreement, gross negligence, or willful misconduct. <span class='aribaPlaceholder'>PARTY_B</span> shall promptly notify <span class='aribaPlaceholder'>PARTY_A</span> in writing of any such claim. This obligation survives termination and is governed by <span class='aribaPlaceholder'>GOVERNING_LAW</span>, effective as of <span class='aribaPlaceholder'>EFFECTIVE_DATE</span>."
+                    "clauseLanguage": "<span class='aribaPlaceholder'>PARTY_A</span> shall indemnify, defend, and hold harmless <span class='aribaPlaceholder'>PARTY_B</span> and its officers, directors, employees, and agents from and against any and all claims, damages, losses, costs, and expenses (including reasonable attorneys' fees) arising out of or relating to <span class='aribaPlaceholder'>PARTY_A</span>'s material breach of this Agreement, gross negligence, or willful misconduct. <span class='aribaPlaceholder'>PARTY_B</span> shall promptly notify <span class='aribaPlaceholder'>PARTY_A</span> in writing of any such claim. This obligation survives termination and is governed by <span class='aribaPlaceholder'>GOVERNING_LAW</span>, effective as of <span class='aribaPlaceholder'>EFFECTIVE_DATE</span>.",
+                    "tags": ["Liability", "Indemnification", "IP Protection"],
+                    "version": 3
                 },
                 {
                     "clauseId": "CL-005",
@@ -226,7 +246,9 @@
                     "changedBy": "John Doe",
                     "changedOn": "Oct 10, 2025",
                     "description": "Fallback indemnification for APAC region with narrowed scope per local regulatory constraints.",
-                    "clauseLanguage": "<span class='aribaPlaceholder'>PARTY_A</span> agrees to indemnify <span class='aribaPlaceholder'>PARTY_B</span> against all direct third-party claims, losses, and reasonable legal costs directly resulting from <span class='aribaPlaceholder'>PARTY_A</span>'s material breach of this Agreement. The scope of indemnification under this clause is limited to direct damages only, in accordance with applicable local regulations. The indemnified party shall notify the indemnifying party in writing within <span class='aribaPlaceholder'>NOTICE_PERIOD</span> days of becoming aware of any such claim. This clause is subject to <span class='aribaPlaceholder'>GOVERNING_LAW</span> and effective from <span class='aribaPlaceholder'>EFFECTIVE_DATE</span>."
+                    "clauseLanguage": "<span class='aribaPlaceholder'>PARTY_A</span> agrees to indemnify <span class='aribaPlaceholder'>PARTY_B</span> against all direct third-party claims, losses, and reasonable legal costs directly resulting from <span class='aribaPlaceholder'>PARTY_A</span>'s material breach of this Agreement. The scope of indemnification under this clause is limited to direct damages only, in accordance with applicable local regulations. The indemnified party shall notify the indemnifying party in writing within <span class='aribaPlaceholder'>NOTICE_PERIOD</span> days of becoming aware of any such claim. This clause is subject to <span class='aribaPlaceholder'>GOVERNING_LAW</span> and effective from <span class='aribaPlaceholder'>EFFECTIVE_DATE</span>.",
+                    "tags": ["Liability", "Indemnification", "APAC", "Regulatory"],
+                    "version": 1
                 }
             ]
         }

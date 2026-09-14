@@ -130,6 +130,8 @@ sap.ui.define([
                             changedOn:       oType.changedOn,
                             description:     oType.description,
                             clauseLanguage:  oType.clauseLanguage,
+                            tags:            oType.tags || [],
+                            version:         oType.version || 1,
                             typeName:        oType.typeName,
                             typeVariant:     oType.typeVariant,
                             typeState:       oVariant.state,
@@ -223,6 +225,8 @@ sap.ui.define([
             oAppModel.setProperty("/selectedChangedOn",    oCtx.getProperty("changedOn"));
             oAppModel.setProperty("/selectedDescription",  oCtx.getProperty("description"));
             oAppModel.setProperty("/selectedClauseLanguage", oCtx.getProperty("clauseLanguage"));
+            oAppModel.setProperty("/selectedTags",          oCtx.getProperty("tags") || []);
+            oAppModel.setProperty("/selectedVersion",        oCtx.getProperty("version") || 1);
             oAppModel.setProperty("/layout", "TwoColumnsMidExpanded");
         },
 

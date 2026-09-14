@@ -1058,3 +1058,7 @@
     white-space: nowrap;
     vertical-align: middle;
 }
+
+.versionValue.sapMText {
+    font-size: 24px;
+}
